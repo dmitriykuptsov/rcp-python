@@ -58,6 +58,7 @@ def main():
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.load_system_host_keys()
+    print("\033[91m")
     if args.password != None:
         # Attempt to connect using password
         client.connect(hostname=args.host, port=args.port, username=args.user, password=args.password)
