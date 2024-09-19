@@ -25,7 +25,7 @@ __status__ = "development"
 # Import the needed libraries
 # RE library
 import re
-# SSH client library
+# SSH/SFTP client library
 import paramiko
 # Timing 
 import time
@@ -38,23 +38,37 @@ from utils import list_files, hash_file
 import os
 
 def main():
+    """
+    Main function which used to run the remote file copy commands
+
+    """
     parser = argparse.ArgumentParser(
                         prog='rcp',
                         description='Copies files and folders to remote Unix machine')
 
-    parser.add_argument("--src", dest="src", required=True)
-    parser.add_argument("--dst", dest="dst", required=True)
-    parser.add_argument("--host", dest="host", required=True)
-    parser.add_argument("--port", dest="port", required=True)
-    parser.add_argument("--user", dest="user", required=True)
-    parser.add_argument("--password", dest="password", required=True)
+    parser.add_argument("--src", dest="src", required=True, help="Source folder or file to be copied")
+    parser.add_argument("--dst", dest="dst", required=True, help="Destination folder where the files will be copied to")
+    parser.add_argument("--host", dest="host", required=True, help="Remote machine to connect to")
+    parser.add_argument("--port", dest="port", required=True, help="Default port for the SSH server")
+    parser.add_argument("--user", dest="user", required=True, help="Username to use for authentication on the remote machine")
+    parser.add_argument("--password", dest="password", required=False, default=None, help="Password to be used for the connection")
+    parser.add_argument("--identity", dest="id", required=False, default=None, help="SSH private key to use for authentication on the remote machine")
     args = parser.parse_args()
 
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.load_system_host_keys()
-    client.connect(hostname=args.host, port=args.port, username=args.user, password=args.password)
-
+    if args.password != None:
+        # Attempt to connect using password
+        client.connect(hostname=args.host, port=args.port, username=args.user, password=args.password)
+    else:
+        # Attempt to connect using authentication key
+        try:
+            client.connect(hostname=args.host, port=args.port, username=args.user, key_filename=args.id)
+        except Exception as e:
+            print(e)
+            print("All authentication combinations have failed...Bye...")
+            exit(-1)
     for p in list_files(args.src):
         file = p.strip()
         hash_local = None
