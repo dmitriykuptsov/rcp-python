@@ -10,10 +10,10 @@ $ pip3 isntalling paramiko
 
 Usage:
 ```
-$ python3 rcp.py --src [folder or file] --dst [folder] --host [remote host] --port [remote port] --user [remote username] 
+$ python3 rcp.py --src [folder or file] --dst [folder] --host [remote host] --port [remote port] --user [remote username] --password [remote password]
 ```
 Example usage:
 
 ```
-$ python3 rcp.py --src test.txt --dst ~ --host 192.168.0.20 --port 22 --user root
+$ python3 rcp.py --src test.txt --dst ~ --host 192.168.0.20 --port 22 --user root --password 123456
 ```
